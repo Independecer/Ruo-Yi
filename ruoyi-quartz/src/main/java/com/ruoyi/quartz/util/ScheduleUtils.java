@@ -20,7 +20,7 @@ import com.ruoyi.quartz.domain.SysJob;
 
 /**
  * 定时任务工具类
- * 
+ *
  * @author ruoyi
  *
  */
@@ -84,16 +84,16 @@ public class ScheduleUtils
         }
 
         // 判断任务是否过期
-        if (StringUtils.isNotNull(CronUtils.getNextExecution(job.getCronExpression())))
-        {
-            // 执行调度任务
-            scheduler.scheduleJob(jobDetail, trigger);
-        }
-
-        // 暂停任务
-        if (job.getStatus().equals(ScheduleConstants.Status.PAUSE.getValue()))
-        {
-            scheduler.pauseJob(ScheduleUtils.getJobKey(jobId, jobGroup));
+        if (StringUtils.isNotNull(CronUtils.getNextExecution(job.getCronExpression()))) {
+            // 暂停任务
+            if (job.getStatus().equals(ScheduleConstants.Status.PAUSE.getValue())) {
+                scheduler.addJob(jobDetail, false);
+                scheduler.pauseJob(getJobKey(jobId, jobGroup));
+                scheduler.scheduleJob(trigger);
+            } else {
+                // 执行调度任务
+                scheduler.scheduleJob(jobDetail, trigger);
+            }
         }
     }
 
@@ -121,7 +121,7 @@ public class ScheduleUtils
 
     /**
      * 检查包名是否为白名单配置
-     * 
+     *
      * @param invokeTarget 目标字符串
      * @return 结果
      */
