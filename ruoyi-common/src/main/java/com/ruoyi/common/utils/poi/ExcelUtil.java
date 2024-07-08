@@ -1088,7 +1088,8 @@ public class ExcelUtil<T>
                     CellRangeAddress cellAddress = new CellRangeAddress(subMergedFirstRowNum, subMergedLastRowNum, column, column);
                     sheet.addMergedRegion(cellAddress);
                 }
-                cell.setCellStyle(styles.get(StringUtils.format("data_{}_{}_{}_{}", attr.align(), attr.color(), attr.backgroundColor(), attr.cellType())));
+                CellStyle cellStyle = styles.get(StringUtils.format("data_{}_{}_{}_{}", attr.align(), attr.color(), attr.backgroundColor(), attr.cellType()));
+                cell.setCellStyle(cellStyle);
 
                 // 用于读取对象中的属性
                 Object value = getTargetValue(vo, field, attr);
@@ -1098,6 +1099,9 @@ public class ExcelUtil<T>
                 String dictType = attr.dictType();
                 if (StringUtils.isNotEmpty(dateFormat) && StringUtils.isNotNull(value))
                 {
+                    // 创建日期格式样式
+                    cellStyle.setDataFormat(this.wb.getCreationHelper().createDataFormat().getFormat(dateFormat));
+                    cell.setCellStyle(cellStyle);
                     cell.setCellValue(parseDateToStr(dateFormat, value));
                 }
                 else if (StringUtils.isNotEmpty(readConverterExp) && StringUtils.isNotNull(value))
